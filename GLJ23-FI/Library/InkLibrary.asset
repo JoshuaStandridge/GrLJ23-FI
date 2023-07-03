@@ -39,3 +39,16 @@ MonoBehaviour:
     masterInkAsset: {fileID: 0}
     includePaths: []
     includes: []
+  - compileAutomatically: 0
+    inkAsset: {fileID: 102900000, guid: 6f0561c3dcc676d4397c6d2efe9d5485, type: 3}
+    jsonAssetDirectory: {fileID: 0}
+    jsonAsset: {fileID: 4900000, guid: 86a410724db76b849a689e954487c9a7, type: 3}
+    unhandledCompileErrors: []
+    errors: []
+    warnings: []
+    todos: []
+    parents: []
+    masterInkAssets: []
+    masterInkAsset: {fileID: 0}
+    includePaths: []
+    includes: []

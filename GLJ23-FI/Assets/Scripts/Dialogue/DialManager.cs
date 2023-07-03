@@ -10,7 +10,9 @@ public class DialManager : MonoBehaviour
 
     [Header("Dialogue UI")]
     [SerializeField] private GameObject dialoguePanel;
-    [SerializeField] private TextMeshProUGUI dialogueText; 
+    [SerializeField] private TextMeshProUGUI dialogueText;
+    [SerializeField] private TextMeshProUGUI displayNameText;
+    [SerializeField] private Animator portraitAnimator;
 
     [Header("Choices UI")]
     [SerializeField] private GameObject[] choices;
@@ -23,6 +25,10 @@ public class DialManager : MonoBehaviour
 
     // singleton class btw
     private static DialManager instance;
+
+    private const string SPEAKER_TAG = "speaker";
+    private const string PORTRAIT_TAG = "portrait";
+    private const string LAYOUT_TAG = "layout";
 
     private void Awake()
     {
@@ -93,9 +99,48 @@ public class DialManager : MonoBehaviour
             
             // display choices, if any, for this dialogue line
             DisplayChoices();
+
+            // handle tags
+            HandleTags(currentStory.currentTags);
         }
         else {
             StartCoroutine(ExitDialogueMode());
+        }
+    }
+
+    private void HandleTags(List<string> currentTags)
+    {
+        // loop thru each tag and handle accordingly
+        foreach (string tag in currentTags)
+        {
+            // parse the tag
+            string[] splitTag = tag.Split(':');
+            // in case of erroroneous formatting
+            if (splitTag.Length != 2)
+            {
+                Debug.LogError("Error parsing the tag " + tag);
+            }
+            string tagKey = splitTag[0].Trim();
+            string tagValue = splitTag[1].Trim();
+
+            // handle the tag
+            switch (tagKey)
+            {
+                case SPEAKER_TAG:
+                    displayNameText.text = tagValue;
+                    //Debug.Log("speaker = " + tagValue);
+                    break;
+                case PORTRAIT_TAG:
+                    portraitAnimator.Play(tagValue);
+                    //Debug.Log("portrait = " + tagValue);
+                    break;
+                case LAYOUT_TAG:
+                    Debug.Log("layout = " + tagValue);
+                    break;
+                default:
+                    Debug.LogWarning("Received but not handled the tag " + tag);
+                    break;
+            }
         }
     }
 
