@@ -13,6 +13,7 @@ public class DialManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI dialogueText;
     [SerializeField] private TextMeshProUGUI displayNameText;
     [SerializeField] private Animator portraitAnimator;
+    private Animator layoutAnimator;
 
     [Header("Choices UI")]
     [SerializeField] private GameObject[] choices;
@@ -48,6 +49,9 @@ public class DialManager : MonoBehaviour
         dialogueIsPlaying = false;
         dialoguePanel.SetActive(false);
 
+        // get the layout animator
+        layoutAnimator = dialoguePanel.GetComponent<Animator>();
+
         // get all of the choices text
         choicesText = new TextMeshProUGUI[choices.Length];
         int index = 0;
@@ -77,6 +81,11 @@ public class DialManager : MonoBehaviour
         currentStory = new Story(inkJSON.text);
         dialogueIsPlaying = true;
         dialoguePanel.SetActive(true);
+
+        // reset portrait, layout, and speaker
+        displayNameText.text = "???";
+        portraitAnimator.Play("default");
+        layoutAnimator.Play("right");
 
         ContinueStory();
     }
@@ -135,7 +144,8 @@ public class DialManager : MonoBehaviour
                     //Debug.Log("portrait = " + tagValue);
                     break;
                 case LAYOUT_TAG:
-                    Debug.Log("layout = " + tagValue);
+                    layoutAnimator.Play(tagValue);
+                    //Debug.Log("layout = " + tagValue);
                     break;
                 default:
                     Debug.LogWarning("Received but not handled the tag " + tag);
