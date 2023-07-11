@@ -359,6 +359,7 @@
 -r:"Library/Bee/artifacts/1900b0aE.dag/UnityEngine.UI.ref.dll"
 "Assets/Ink/Demos/Basic Demo/Scripts/BasicInkExample.cs"
 "Assets/Ink/Demos/Basic Demo/Scripts/QuitGameOnKeypress.cs"
+"Assets/Scripts/Abilities/LineTool.cs"
 "Assets/Scripts/Dialogue/DialManager.cs"
 "Assets/Scripts/Dialogue/DialTrigger.cs"
 "Assets/Scripts/Helpers.cs"

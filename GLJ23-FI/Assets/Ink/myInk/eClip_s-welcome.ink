@@ -23,17 +23,28 @@ You should give it a try!
 
 { godVpaint:
 - 1: 
-[I want to cause destruction.] #speaker:vRuss #portrait:vRuss_disturb #layout:left
-[Gods will tremble before me.] #speaker:vRuss #portrait:vRuss_disappoint #layout:left
+-> god
 - 2: 
-[I want to cause destruction.] #speaker:vRuss #portrait:vRuss_disturb #layout:left
-[I will blot out the sun itself.] #speaker:vRuss #portrait:vRuss_disappoint #layout:left
+-> paint
 - else: error
+-> main
 }
 
-- ... #speaker:eClip #portrait:eClip_shook #layout:right
+=== god ===
++ I want to cause destruction. #speaker:vRuss #portrait:vRuss_disturb #layout:left
++ Gods will tremble before me. #speaker:vRuss #portrait:vRuss_disappoint #layout:left
+- -> maintwo
+
+=== paint ===
++ I want to cause destruction. #speaker:vRuss #portrait:vRuss_disturb #layout:left
++ I will blot out the sun itself. #speaker:vRuss #portrait:vRuss_disappoint #layout:left
+- -> maintwo
+
+=== maintwo ===
+... #speaker:eClip #portrait:eClip_shook #layout:right
 That's the spirit! #portrait:eClip_happy
 You can access MS Pigment from the Go Menu.
 Praise Michael!
 
 -> END
+

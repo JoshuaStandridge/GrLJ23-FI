@@ -29,10 +29,14 @@ public class PlayerMove : MonoBehaviour
 
     float horizontalInput;
     float verticalInput;
-
+ 
     Vector3 moveDirection;
 
     Rigidbody rb;
+
+    public bool freeze;
+
+    public bool activeGrapple;
 
     private void Start()
     {
@@ -54,10 +58,18 @@ public class PlayerMove : MonoBehaviour
         SpeedControl();
 
         // handle drag
-        if (grounded)
-            rb.drag = groundDrag;
-        else
-            rb.drag = 0;
+        if (grounded && !activeGrapple) {
+            rb.drag = groundDrag; }
+        else {
+            rb.drag = 0; }
+        
+        if (freeze) {
+            moveSpeed = 0;
+            rb.velocity = Vector3.zero;
+        }
+        else {
+            moveSpeed = 7;
+        }
     }
 
     private void FixedUpdate()
@@ -83,6 +95,8 @@ public class PlayerMove : MonoBehaviour
 
     private void MovePlayer()
     {
+        if (activeGrapple) return;
+
         // calculate movement direction
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
@@ -97,6 +111,9 @@ public class PlayerMove : MonoBehaviour
 
     private void SpeedControl()
     {
+        if (activeGrapple) return;
+
+
         Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
         // limit velocity if needed
@@ -119,45 +136,50 @@ public class PlayerMove : MonoBehaviour
         readyToJump = true;
     }
 
-    /*
-    [SerializeField] private Rigidbody _rb;
-    [SerializeField] private float _speed = 5;
-    [SerializeField] private float _turnSpeed = 360;
-    private Vector3 _inputWASD; 
-    [SerializeField] private Camera pCam;
+    private bool enableMoveOnNextTouch;
 
-    void Update() {
-        GatherInput();
-        Look();
+    public void JumpToPosition(Vector3 targetPosition, float trajectoryHeight)
+    {
+        activeGrapple = true;
+
+        velocityToSet = CalculateJumpVelocity(transform.position, targetPosition, trajectoryHeight);
+        Invoke(nameof(SetVelocity), 0.1f);
+
+        Invoke(nameof(ResetRestrictions), 3f);
     }
 
-    void FixedUpdate() {
-        Move();
-    }
-    
-    void GatherInput() {
-        // two-axis movement
-        _inputWASD = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-        
+    private Vector3 velocityToSet;
+    private void SetVelocity()
+    {
+        enableMoveOnNextTouch = true;
+        rb.velocity = velocityToSet;
     }
 
-    void Look() {
-        // rotation skewing adjustment
-        if (_inputWASD != Vector3.zero) {
+    public void ResetRestrictions()
+    {
+        activeGrapple = false;
+    }
 
-            var pMatrix = Matrix4x4.Rotate(Quaternion.Euler(0, -45, 0));
-            var skewedInput = pMatrix.MultiplyPoint3x4(_inputWASD);
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (enableMoveOnNextTouch) {
+            enableMoveOnNextTouch = false;
+            ResetRestrictions();
 
-            var relativeV = (transform.position + skewedInput) - transform.position;
-            var lookRot = Quaternion.LookRotation(relativeV, Vector3.up);
-
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRot, _turnSpeed * Time.deltaTime);
+            GetComponent<LineTool>().StopGrapple();
         }
-        
     }
 
-    void Move() {
-        // actually move the thing
-        _rb.MovePosition(transform.position + (transform.forward * _inputWASD.magnitude) * _speed * Time.deltaTime);
-    }*/
+    public Vector3 CalculateJumpVelocity(Vector3 startPoint, Vector3 endPoint, float trajectoryHeight)
+    {
+        float gravity = Physics.gravity.y;
+        float displacementY = endPoint.y - startPoint.y;
+        Vector3 displacementXZ = new Vector3(endPoint.x - startPoint.x, 0f, endPoint.z - startPoint.z);
+
+        Vector3 velocityY = Vector3.up * Mathf.Sqrt(-2 * gravity * trajectoryHeight);
+        Vector3 velocityXZ = displacementXZ / (Mathf.Sqrt(-2 * trajectoryHeight / gravity) + Mathf.Sqrt(2 * (displacementY - trajectoryHeight) / gravity));
+
+        return velocityXZ + velocityY;
+    }
+
 }
